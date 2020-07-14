@@ -9,7 +9,7 @@ var connection = mysql.createConnection({
   user: "root",
   // Your password
   password: "password",
-  database: "",
+  database: "employee_tracker",
 });
 connection.connect(function (err) {
   if (err) throw err;
@@ -33,5 +33,27 @@ function startSearch() {
           connection.end();
           break;
       }
+    });
+}
+
+function addNewDepartment() {
+  inquirer
+    .prompt({
+      name: "department",
+      type: "input",
+      message: "What is the department name?",
+    })
+    .then(function (answer) {
+      const query = `INSERT INTO department(name) VALUES ?`;
+      connection.query(query, { department: answer.department }, function (
+        err,
+        res
+      ) {
+        //if (err) throw err;
+        // for (var i = 0; i < res.length; i++) {
+        console.log(res.department);
+        //}
+        //startSearch();
+      });
     });
 }
