@@ -29,6 +29,7 @@ function startSearch() {
         "View all roles",
         "Add an employee",
         "View all employees",
+        "Update an employee's role",
         "Exit",
       ],
     })
@@ -51,6 +52,9 @@ function startSearch() {
           break;
         case "View all employees":
           viewAllEmployees();
+          break;
+        case "Update an employee's role":
+          updateEmployee();
           break;
         case "Exit":
           connection.end();
@@ -218,4 +222,57 @@ INNER JOIN department ON role.department_id = department.id;`;
     console.table(res);
     startSearch();
   });
+}
+
+function updateEmployee() {
+  inquirer
+    .prompt({
+      name: "fname",
+      type: "input",
+      message: "What is the employee's name?",
+    })
+    .then(function (newName) {
+      inquirer
+        .prompt({
+          name: "lname",
+          type: "input",
+          message: "What is their last name?",
+        })
+        .then(function (newLastName) {
+          inquirer
+            .prompt({
+              name: "managerId",
+              type: "input",
+              message: "What is the Manager ID?",
+            })
+            .then(function (managerid) {
+              inquirer
+                .prompt({
+                  name: "id",
+                  type: "input",
+                  message: "What is the role ID?",
+                })
+                .then(function (employeeId) {
+                  const firstname = newName.fname;
+                  const lastname = newLastName.lname;
+                  const newDeptId = managerid.managerId;
+                  const ID = employeeId.id;
+                  const sqlString = `UPDATE employee
+                  SET first_name = ?, last_name = ?, manager_id = ?
+                  WHERE id = ?;`;
+                  connection.query(
+                    sqlString,
+                    [firstname, lastname, newDeptId, ID],
+                    function (err, res) {
+                      if (err) {
+                        console.log("Error adding a role");
+                      }
+                      console.table(res);
+                      startSearch();
+                    }
+                  );
+                });
+            });
+        });
+    });
 }
