@@ -141,7 +141,10 @@ function addNewRole() {
 
 //view all roles
 function viewAllRoles() {
-  const query = "SELECT * FROM role";
+  const query = `SELECT role.department_id AS ID, department.name AS Department, role.title AS Title, role.salary AS Salary
+  FROM role
+  LEFT JOIN department
+  ON department.id = role.department_id;`;
   connection.query(query, function (err, res) {
     if (err) {
       throw err;
