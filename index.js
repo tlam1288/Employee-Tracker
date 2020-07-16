@@ -74,6 +74,7 @@ function addNewDepartment() {
           throw err;
         }
         console.log("Department was added successfully");
+
         startSearch();
       });
     });
@@ -93,61 +94,58 @@ function viewDepartments() {
 
 function addNewRole() {
   inquirer
-    .prompt(
-      {
-        name: "role",
-        type: "input",
-        message: "What role would you like to add?",
-      },
-      {
-        name: "salary",
-        type: "input",
-        message: "What is the salary for this role?",
-      },
-      {
-        name: "id",
-        type: "input",
-        message: "What is the department ID?",
-      }
-    )
-    .then(function (answer) {
-      const query = `INSERT INTO role(title,salary, department_id) VALUES (?,?,?)`;
-      connection.query(
-        query,
-        [answer.role, answer.salary, answer.id],
-        function (err, res) {
-          if (err) {
-            throw err;
-          }
-          console.log("A new role was added successfully");
-          //addSalary();
-        }
-      );
-    });
-}
-//add salary
-function addSalary() {
-  inquirer
     .prompt({
-      name: "salary",
+      name: "role",
       type: "input",
-      message: "What is the salary for this role?",
+      message: "What role would you like to add?",
     })
-    .then(function (answer) {
-      const query = `INSERT INTO role(salary) VALUES (?) WHERE title = ${this.answer.role}`;
-      connection.query(query, answer.salary, function (err, res) {
-        if (err) {
-          throw err;
-        }
-        console.log("Salary was added successfully");
-        startSearch();
-      });
+    .then(function (roleToAdd) {
+      inquirer
+        .prompt({
+          name: "salary",
+          type: "input",
+          message: "What is the salary for this role?",
+        })
+        .then(function (salaryToAdd) {
+          inquirer
+            .prompt({
+              name: "id",
+              type: "input",
+              message: "What is the department ID?",
+            })
+            .then(function (deptId) {
+              const newRole = roleToAdd.role;
+              const newSalary = salaryToAdd.salary;
+              const newDeptId = deptId.id;
+              const sqlString = `INSERT INTO role(title, salary, department_id)
+              VALUES (?, ? ,?);`;
+              connection.query(
+                sqlString,
+                [newRole, newSalary, newDeptId],
+                function (err, res) {
+                  if (err) {
+                    console.log("Error adding a role");
+                  }
+                  console.table(res);
+                  startSearch();
+                }
+              );
+            });
+        });
     });
 }
 
 //view all roles
 function viewAllRoles() {
-  const query = "SELECT * FROM role";
+  const query = `SELECT
+  employee.id AS ID,
+  CONCAT(employee.first_name, " ", employee.last_name) AS Name,
+  role.title AS Role,
+  department.name AS Department,
+  employee.manager_id AS ManagerID
+  FROM employee
+  INNER JOIN role ON employee.role_id = role.id
+  INNER JOIN department ON role.department_id = department.id;`;
   connection.query(query, function (err, res) {
     if (err) {
       throw err;
@@ -157,16 +155,27 @@ function viewAllRoles() {
   });
 }
 
+//add new employee
 function addEmployee() {
   inquirer
-    .prompt({
-      name: "firstname",
-      type: "input",
-      message: "What is the first name of the employee?",
-    })
+    .prompt(
+      {
+        name: "firstname",
+        type: "input",
+        message: "What is the first name of the employee?",
+      },
+      {
+        name: "lastname",
+        type: "input",
+        message: "What is the last name of the employee?",
+      }
+    )
     .then(function (answer) {
-      const query = `INSERT INTO employee(first_name) VALUES (?) `;
-      connection.query(query, answer.firstname, function (err, res) {
+      const query = `INSERT INTO employee(first_name, last_name) VALUES (?, ?) `;
+      connection.query(query, [answer.firstname, answer.lastname], function (
+        err,
+        res
+      ) {
         if (err) {
           throw err;
         }
@@ -176,4 +185,14 @@ function addEmployee() {
     });
 }
 
-function viewAllEmployees() {}
+//view all employees
+function viewAllEmployees() {
+  const query = "SELECT * FROM employee";
+  connection.query(query, function (err, res) {
+    if (err) {
+      throw err;
+    }
+    console.table(res);
+    startSearch();
+  });
+}
