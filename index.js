@@ -137,15 +137,7 @@ function addNewRole() {
 
 //view all roles
 function viewAllRoles() {
-  const query = `SELECT
-  employee.id AS ID,
-  CONCAT(employee.first_name, " ", employee.last_name) AS Name,
-  role.title AS Role,
-  department.name AS Department,
-  employee.manager_id AS ManagerID
-  FROM employee
-  INNER JOIN role ON employee.role_id = role.id
-  INNER JOIN department ON role.department_id = department.id;`;
+  const query = "SELECT * FROM role";
   connection.query(query, function (err, res) {
     if (err) {
       throw err;
