@@ -158,30 +158,53 @@ function viewAllRoles() {
 //add new employee
 function addEmployee() {
   inquirer
-    .prompt(
-      {
-        name: "firstname",
-        type: "input",
-        message: "What is the first name of the employee?",
-      },
-      {
-        name: "lastname",
-        type: "input",
-        message: "What is the last name of the employee?",
-      }
-    )
-    .then(function (answer) {
-      const query = `INSERT INTO employee(first_name, last_name) VALUES (?, ?) `;
-      connection.query(query, [answer.firstname, answer.lastname], function (
-        err,
-        res
-      ) {
-        if (err) {
-          throw err;
-        }
-        console.log("Employee was added successfully");
-        startSearch();
-      });
+    .prompt({
+      name: "fname",
+      type: "input",
+      message: "What is the employee's name?",
+    })
+    .then(function (newName) {
+      inquirer
+        .prompt({
+          name: "lname",
+          type: "input",
+          message: "What is their last name?",
+        })
+        .then(function (newLastName) {
+          inquirer
+            .prompt({
+              name: "id",
+              type: "input",
+              message: "What is the role ID?",
+            })
+            .then(function (roleId) {
+              inquirer
+                .prompt({
+                  name: "managerId",
+                  type: "input",
+                  message: "What is the Manager ID?",
+                })
+                .then(function (managerid) {
+                  const firstname = newName.fname;
+                  const lastname = newLastName.lname;
+                  const role_Id = roleId.id;
+                  const newDeptId = managerid.managerId;
+                  const sqlString = `INSERT INTO employee(first_name, last_name, role_id, manager_id)
+                  VALUES (?,?,?,?);`;
+                  connection.query(
+                    sqlString,
+                    [firstname, lastname, role_Id, newDeptId],
+                    function (err, res) {
+                      if (err) {
+                        console.log("Error adding a role");
+                      }
+                      console.table(res);
+                      startSearch();
+                    }
+                  );
+                });
+            });
+        });
     });
 }
 
