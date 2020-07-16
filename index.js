@@ -130,7 +130,7 @@ function addNewRole() {
                   if (err) {
                     console.log("Error adding a role");
                   }
-                  console.table(res);
+
                   startSearch();
                 }
               );
@@ -197,7 +197,7 @@ function addEmployee() {
                       if (err) {
                         console.log("Error adding a role");
                       }
-                      console.table(res);
+
                       startSearch();
                     }
                   );
