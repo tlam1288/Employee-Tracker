@@ -38,3 +38,14 @@ SELECT
       FROM employee
       INNER JOIN role ON employee.role_id = role.id
       INNER JOIN department ON role.department_id = department.id;
+
+--updated query
+UPDATE employee
+SET first_name = ?, last_name = ?, manager_id = ?
+WHERE id = ?;
+
+--display merged tables of departmant and roles
+SELECT role.department_id AS ID, department.name AS Department, role.title AS Title, role.salary AS Salary
+FROM role
+LEFT JOIN department
+ON department.id = role.department_id;
